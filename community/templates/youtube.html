@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <link rel="stylesheet" href=" {% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href=" {% static 'css/style.css' %} ">
+</head>
+<body>
+    <h1>Canales de Youtube</h1>
+    {% for channel in context %}
+        <img src="{{ channel.image }}" alt="">
+        <h2>{{ channel.title }}</h2>
+        <!-- <p>{{ channel.id }}</p> -->
+        <p>{{ channel.description }}</p>
+        {% for playlist in channel.playlists %}
+        <ol>
+            <li>{{ playlist.title }}</li>
+            <li>{{ playlist.id }}</li>
+            <li>{{ playlist.publishedAt }}</li>
+            <img src="{{ playlist.image }}" alt="">
+        </ol>
+        {% endfor %}
+    {% endfor %}
+    
+
+    
+    
+    <!--{%for titles in channel.items%}
+        {% for ti in titles.snippet %}
+          
+            <h1>{{ti}}</h1>
+          
+        {%endfor%}
+    {%endfor%}-->
+
+    
+    
+</body>
+</html>

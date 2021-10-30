@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% for list in comment %}
+                <h1 class="title">{{ list.title }}</h1>
+                <div class="parrafo1">
+                    <h3><strong> RECURSO #1 PARA <br>CONSEGUIR ENLACES </strong></h3>
+                </div>
+                <div class="col">
+                    <div class="parrafo2">
+                        <h3>{{ list.description }}</h3>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="#" class="rounded float-end robot" alt="">
+                </div>
+            {% endfor %}
+        </div>
+        <br><p>Visítanos en Telegram</p>
+    </div>
+{% endblock %}
