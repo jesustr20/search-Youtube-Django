@@ -14,32 +14,38 @@ from urllib import parse, request
 
 class SearchPrivate(View):
     template_name = 'searchchannel.html'
+    api_key = 'AIzaSyAz9mAAmXf7eVzsabaSK5C1Q0VAS6VyZkw'
 
     def get(self, request, *args, **kwargs):
-
-        q = request.GET.get("q")
-        print(q)
-
-        context = self.getDataYoutube(q)
+        context = {}
+        q = context['search'] = request.GET.get("q", "")
+        if q:
+            # context['data_api'] = self.getDataYoutube(q)
+            context['data_api'] = self._get_channels_from_json_file(q, 3)
         return render(request, 'searchchannel.html', {'context': context})
 
-    def getDataYoutube(self, q):
+    def _get_channels_from_json_file(self, search, quantity_channels):
+        with open('C:/Proyectos/proyecto_librosFree/Proyecto_uno_libros/community/channels2.json', 'r', encoding='utf-8') as f:
+            items = json.load(f)
+        items['title'] = search
+        list_data = [items for i in range(quantity_channels)]
+        return list_data
 
-        url_SearchChannel = 'https://youtube.googleapis.com/youtube/v3/search'
-        api_key = 'AIzaSyAXqvLzv4WRj9DaabOi4upr1EnmcinSxio'
-        params_playlist = {
+    def getDataYoutube(self, q):
+        url_search_channel = 'https://youtube.googleapis.com/youtube/v3/search'
+        channels = []
+
+        params_search_channel = {
             'part': 'snippet',
-            'maxResults': 10,
+            'maxResults': 2,
             'q': q,
             'type': 'channel',
-            # 'type': 'playlist',
-            'key': api_key
+            'key': self.api_key
         }
-        url_values = parse.urlencode(params_playlist)
-        with request.urlopen(url_SearchChannel+'?'+url_values) as res:
-            json_res = json.loads(res.read())
-        channel_items = json_res['items']
-        channels = []
+
+        channel_items = self._get_api_items(
+            url_search_channel, params_search_channel)
+
         for channel_item in channel_items:
             channel_id = channel_item['snippet']['channelId']
             channel = {
@@ -49,9 +55,42 @@ class SearchPrivate(View):
                 'image': channel_item['snippet']['thumbnails']['default']['url'],
                 'playlists': []
             }
+            playlist_data = self.playlistData(channel_id)
+            channel['playlists'] = playlist_data
             channels.append(channel)
-        # return json.dumps(channels, indent=4)
         return channels
+
+    def playlistData(self, channel_id):
+        url_linkPlayList = 'https://youtube.googleapis.com/youtube/v3/playlists'
+
+        playlists = []
+
+        params_playlist = {
+            'key': self.api_key,
+            'part': 'snippet',
+            'channelId': channel_id,
+            'maxResults': 5,
+        }
+
+        playlists_items = self._get_api_items(
+            url_linkPlayList, params_playlist)
+
+        for playlists_item in playlists_items:
+            playlist = {
+                'id': playlists_item['id'],
+                'title': playlists_item['snippet']['title'],
+                'publishedAt': playlists_item['snippet']['publishedAt'],
+                'image': playlists_item['snippet']['thumbnails']['default']['url']
+            }
+            playlists.append(playlist)
+
+        return playlists
+
+    def _get_api_items(self, url, params):
+        url_params = parse.urlencode(params)
+        with request.urlopen(url + '?' + url_params) as response:
+            json_response = json.loads(response.read())
+        return json_response['items']
 
 
 class YoutubeView(TemplateView):
@@ -92,8 +131,15 @@ class YoutubeView(TemplateView):
         context['id'] = ides
         context['playlistId'] = playlistId
 
-        context = self.channelData()
+        # context = self.channelData()
+        context = self._get_channels_from_json_file(3)
         return {'context': context}
+
+    def _get_channels_from_json_file(self, quantity_channels):
+        with open('C:/Proyectos/proyecto_librosFree/Proyecto_uno_libros/community/channels2.json', 'r', encoding='utf-8') as f:
+            items = json.load(f)
+        list_data = [items for i in range(quantity_channels)]
+        return list_data
 
     def channelData(self):
         url_link = 'https://youtube.googleapis.com/youtube/v3/search'

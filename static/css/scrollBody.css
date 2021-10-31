@@ -1,0 +1,19 @@
+.modal-body {
+  height: 350px;
+  overflow: hidden;
+}
+
+.modal-body:hover {
+  overflow-y: auto;
+}
+
+.popupheader {
+  background-color: black;
+  color: white;
+}
+
+.fade {
+  opacity: 1;
+  -webkit-transaction: opacity ls linear;
+  transaction: opacity ls linear;
+}
